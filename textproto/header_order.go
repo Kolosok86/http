@@ -1,4 +1,4 @@
-package http
+package textproto
 
 import (
 	"strings"
@@ -8,7 +8,7 @@ import (
 // HeaderOrder create header order
 type HeaderOrder struct {
 	mu    sync.RWMutex
-	order []string
+	Order []string
 }
 
 func (h *HeaderOrder) Add(key string) {
@@ -21,7 +21,7 @@ func (h *HeaderOrder) Add(key string) {
 		return
 	}
 
-	h.order = append(h.order, formatted)
+	h.Order = append(h.Order, formatted)
 }
 
 func (h *HeaderOrder) Del(key string) {
@@ -35,11 +35,11 @@ func (h *HeaderOrder) Del(key string) {
 		return
 	}
 
-	h.order = append(h.order[:i], h.order[i+1:]...)
+	h.Order = append(h.Order[:i], h.Order[i+1:]...)
 }
 
 func (h *HeaderOrder) FindIndex(key string) int {
-	for i, value := range h.order {
+	for i, value := range h.Order {
 		if value == key {
 			return i
 		}

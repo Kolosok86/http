@@ -16,16 +16,16 @@ import (
 	"fmt"
 	"io"
 	"mime"
-	"mime/multipart"
 	"net"
-	"net/http/httptrace"
 	"net/url"
 	urlpkg "net/url"
 	"strconv"
 	"strings"
 	"sync"
 
+	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal/ascii"
+	"github.com/Kolosok86/http/internal/multipart"
 	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/idna"
 )
@@ -167,6 +167,7 @@ type Request struct {
 	// values in Header may be ignored. See the documentation
 	// for the Request.Write method.
 	Header Header
+	Order  textproto.HeaderOrder
 
 	// Body is the request's body.
 	//
@@ -1085,11 +1086,14 @@ func readRequest(b *bufio.Reader) (req *Request, err error) {
 	}
 
 	// Subsequent lines: Key: value.
-	mimeHeader, _, err := tp.ReadMIMEHeader()
+	mimeHeader, order, err := tp.ReadMIMEHeader()
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header = Header(mimeHeader)
+	req.Order = order
+
 	if len(req.Header["Host"]) > 1 {
 		return nil, fmt.Errorf("too many Host headers")
 	}

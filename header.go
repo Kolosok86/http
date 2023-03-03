@@ -6,12 +6,12 @@ package http
 
 import (
 	"io"
-	"net/http/httptrace"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
@@ -156,12 +156,31 @@ type keyValues struct {
 // by key. It's used as a pointer, so it can fit in a sort.Interface
 // interface value without allocation.
 type headerSorter struct {
-	kvs []keyValues
+	order textproto.HeaderOrder
+	kvs   []keyValues
 }
 
-func (s *headerSorter) Len() int           { return len(s.kvs) }
-func (s *headerSorter) Swap(i, j int)      { s.kvs[i], s.kvs[j] = s.kvs[j], s.kvs[i] }
-func (s *headerSorter) Less(i, j int) bool { return s.kvs[i].key < s.kvs[j].key }
+func (s *headerSorter) Len() int      { return len(s.kvs) }
+func (s *headerSorter) Swap(i, j int) { s.kvs[i], s.kvs[j] = s.kvs[j], s.kvs[i] }
+func (s *headerSorter) Less(i, j int) bool {
+	// If the order isn't defined, sort lexicographically.
+	if len(s.order.Order) == 0 {
+		return s.kvs[i].key < s.kvs[j].key
+	}
+
+	ii := s.order.FindIndex(strings.ToLower(s.kvs[i].key))
+	ji := s.order.FindIndex(strings.ToLower(s.kvs[j].key))
+
+	if ii == -1 && ji == -1 {
+		return s.kvs[i].key < s.kvs[j].key
+	} else if ii == -1 && ji > -1 {
+		return false
+	} else if ji == -1 && ii > -1 {
+		return true
+	}
+
+	return ii < ji
+}
 
 var headerSorterPool = sync.Pool{
 	New: func() any { return new(headerSorter) },

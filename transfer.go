@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http/httptrace"
 	"reflect"
 	"sort"
 	"strconv"
@@ -18,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal"
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/textproto"

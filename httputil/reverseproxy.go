@@ -15,12 +15,12 @@ import (
 	"mime"
 	"net"
 	"net/http"
-	"net/http/httptrace"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"

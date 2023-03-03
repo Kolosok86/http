@@ -5,9 +5,9 @@
 package http
 
 import (
-	"mime/multipart"
 	"net/url"
 
+	"github.com/Kolosok86/http/internal/multipart"
 	"github.com/Kolosok86/http/textproto"
 )
 

@@ -12,7 +12,6 @@ import (
 	"io"
 	"io/fs"
 	"mime"
-	"mime/multipart"
 	"net/url"
 	"os"
 	"path"
@@ -22,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Kolosok86/http/internal/multipart"
 	"github.com/Kolosok86/http/textproto"
 )
 

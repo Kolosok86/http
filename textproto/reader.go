@@ -14,8 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/Kolosok86/http"
 )
 
 // A Reader implements convenience methods for reading requests
@@ -480,13 +478,13 @@ var colon = []byte(":")
 //		"My-Key": {"Value 1", "Value 2"},
 //		"Long-Key": {"Even Longer Value"},
 //	}
-func (r *Reader) ReadMIMEHeader() (MIMEHeader, http.HeaderOrder, error) {
+func (r *Reader) ReadMIMEHeader() (MIMEHeader, HeaderOrder, error) {
 	return readMIMEHeader(r, math.MaxInt64)
 }
 
 // readMIMEHeader is a version of ReadMIMEHeader which takes a limit on the header size.
 // It is called by the mime/multipart package.
-func readMIMEHeader(r *Reader, lim int64) (MIMEHeader, http.HeaderOrder, error) {
+func readMIMEHeader(r *Reader, lim int64) (MIMEHeader, HeaderOrder, error) {
 	// Avoid lots of small slice allocations later by allocating one
 	// large one ahead of time which we'll cut up into smaller
 	// slices. If this isn't big enough later, we allocate small ones.
@@ -497,7 +495,7 @@ func readMIMEHeader(r *Reader, lim int64) (MIMEHeader, http.HeaderOrder, error) 
 	}
 
 	m := make(MIMEHeader, hint)
-	h := http.HeaderOrder{}
+	h := HeaderOrder{}
 
 	// The first line cannot start with a leading space.
 	if buf, err := r.R.Peek(1); err == nil && (buf[0] == ' ' || buf[0] == '\t') {

@@ -49,6 +49,7 @@ type Response struct {
 	//
 	// Keys in the map are canonicalized (see CanonicalHeaderKey).
 	Header Header
+	Order  textproto.HeaderOrder
 
 	// Body represents the response body.
 	//
@@ -185,14 +186,16 @@ func ReadResponse(r *bufio.Reader, req *Request) (*Response, error) {
 	}
 
 	// Parse the response headers.
-	mimeHeader, _, err := tp.ReadMIMEHeader()
+	mimeHeader, order, err := tp.ReadMIMEHeader()
 	if err != nil {
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
 		}
 		return nil, err
 	}
+
 	resp.Header = Header(mimeHeader)
+	resp.Order = order
 
 	fixPragmaCacheControl(resp.Header)
 
