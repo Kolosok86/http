@@ -19,7 +19,6 @@ import (
 	"mime/multipart"
 	"net"
 	"net/http/httptrace"
-	"net/textproto"
 	"net/url"
 	urlpkg "net/url"
 	"strconv"
@@ -27,6 +26,7 @@ import (
 	"sync"
 
 	"github.com/Kolosok86/http/internal/ascii"
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/idna"
 )
 
@@ -1085,7 +1085,7 @@ func readRequest(b *bufio.Reader) (req *Request, err error) {
 	}
 
 	// Subsequent lines: Key: value.
-	mimeHeader, err := tp.ReadMIMEHeader()
+	mimeHeader, _, err := tp.ReadMIMEHeader()
 	if err != nil {
 		return nil, err
 	}

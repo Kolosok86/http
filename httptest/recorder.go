@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/textproto"
 	"strconv"
 	"strings"
 
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 )
 

@@ -10,8 +10,9 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"net/textproto"
 	"sync"
+
+	"github.com/Kolosok86/http/textproto"
 )
 
 var (

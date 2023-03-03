@@ -17,7 +17,6 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"net/textproto"
 	"net/url"
 	urlpkg "net/url"
 	"os"
@@ -30,6 +29,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 )
 

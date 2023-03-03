@@ -21,7 +21,6 @@ import (
 	"log"
 	"net"
 	"net/http/httptrace"
-	"net/textproto"
 	"net/url"
 	"os"
 	"reflect"
@@ -31,6 +30,7 @@ import (
 	"time"
 
 	"github.com/Kolosok86/http/internal/ascii"
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 	"golang.org/x/net/http/httpproxy"
 )

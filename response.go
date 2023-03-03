@@ -13,11 +13,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/textproto"
 	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 )
 
@@ -185,7 +185,7 @@ func ReadResponse(r *bufio.Reader, req *Request) (*Response, error) {
 	}
 
 	// Parse the response headers.
-	mimeHeader, err := tp.ReadMIMEHeader()
+	mimeHeader, _, err := tp.ReadMIMEHeader()
 	if err != nil {
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF

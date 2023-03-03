@@ -21,7 +21,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/textproto"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,6 +29,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 )
 

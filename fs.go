@@ -13,7 +13,6 @@ import (
 	"io/fs"
 	"mime"
 	"mime/multipart"
-	"net/textproto"
 	"net/url"
 	"os"
 	"path"
@@ -22,6 +21,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Kolosok86/http/textproto"
 )
 
 // A Dir implements FileSystem using the native file system restricted to a

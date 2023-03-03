@@ -10,11 +10,11 @@ import (
 	"context"
 	"crypto/tls"
 	"net"
-	"net/textproto"
 	"reflect"
 	"time"
 
 	"github.com/Kolosok86/http/internal/nettrace"
+	"github.com/Kolosok86/http/textproto"
 )
 
 // unique type to prevent assignment.

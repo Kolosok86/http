@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/textproto"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Kolosok86/http/internal/ascii"
+	"github.com/Kolosok86/http/textproto"
 )
 
 // A Cookie represents an HTTP cookie as sent in the Set-Cookie header of an

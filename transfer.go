@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"net/http/httptrace"
-	"net/textproto"
 	"reflect"
 	"sort"
 	"strconv"
@@ -21,6 +20,7 @@ import (
 
 	"github.com/Kolosok86/http/internal"
 	"github.com/Kolosok86/http/internal/ascii"
+	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"
 )
 
@@ -928,7 +928,7 @@ func (b *body) readTrailer() error {
 		return errors.New("http: suspiciously long trailer after chunked body")
 	}
 
-	hdr, err := textproto.NewReader(b.r).ReadMIMEHeader()
+	hdr, _, err := textproto.NewReader(b.r).ReadMIMEHeader()
 	if err != nil {
 		if err == io.EOF {
 			return errTrailerEOF
