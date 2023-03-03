@@ -5,17 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61cabe45-dae9-41f7-853a-dbbe2653eaec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/lazyregexp/lazyre.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/nettrace/nettrace.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/encode.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/filter.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/legacy_profile.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/merge.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/profile.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/profile_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/proto.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/proto_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/profile/prune.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/header.go" beforeDir="false" afterPath="$PROJECT_DIR$/header.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,19 +29,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/Users/vladislav/Desktop/http/internal",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/vladislav/Desktop/http/internal&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/internal" />
