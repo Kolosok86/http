@@ -16,13 +16,13 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
-	"net/http/internal/ascii"
 	"net/textproto"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http/internal/ascii"
 	"golang.org/x/net/http/httpguts"
 )
 

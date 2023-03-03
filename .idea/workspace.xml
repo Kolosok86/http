@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="61cabe45-dae9-41f7-853a-dbbe2653eaec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="61cabe45-dae9-41f7-853a-dbbe2653eaec" name="Changes" comment="fix import">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/header.go" beforeDir="false" afterPath="$PROJECT_DIR$/header.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/httputil/reverseproxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/httputil/reverseproxy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +61,10 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix import" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix import" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
