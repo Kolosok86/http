@@ -83,11 +83,11 @@ func (h Header) Del(key string) {
 
 // Write writes a header in wire format.
 func (h Header) Write(w io.Writer) error {
-	return h.write(w, nil)
+	return h.write(w, nil, textproto.HeaderOrder{})
 }
 
-func (h Header) write(w io.Writer, trace *httptrace.ClientTrace) error {
-	return h.writeSubset(w, nil, trace)
+func (h Header) write(w io.Writer, trace *httptrace.ClientTrace, order textproto.HeaderOrder) error {
+	return h.writeSubset(w, nil, order, trace)
 }
 
 // Clone returns a copy of h or nil if h is nil.
@@ -189,7 +189,7 @@ var headerSorterPool = sync.Pool{
 // sortedKeyValues returns h's keys sorted in the returned kvs
 // slice. The headerSorter used to sort is also returned, for possible
 // return to headerSorterCache.
-func (h Header) sortedKeyValues(exclude map[string]bool) (kvs []keyValues, hs *headerSorter) {
+func (h Header) sortedKeyValues(exclude map[string]bool, order textproto.HeaderOrder) (kvs []keyValues, hs *headerSorter) {
 	hs = headerSorterPool.Get().(*headerSorter)
 	if cap(hs.kvs) < len(h) {
 		hs.kvs = make([]keyValues, 0, len(h))
@@ -200,6 +200,7 @@ func (h Header) sortedKeyValues(exclude map[string]bool) (kvs []keyValues, hs *h
 			kvs = append(kvs, keyValues{k, vv})
 		}
 	}
+	hs.order = order
 	hs.kvs = kvs
 	sort.Sort(hs)
 	return kvs, hs
@@ -209,15 +210,15 @@ func (h Header) sortedKeyValues(exclude map[string]bool) (kvs []keyValues, hs *h
 // If exclude is not nil, keys where exclude[key] == true are not written.
 // Keys are not canonicalized before checking the exclude map.
 func (h Header) WriteSubset(w io.Writer, exclude map[string]bool) error {
-	return h.writeSubset(w, exclude, nil)
+	return h.writeSubset(w, exclude, textproto.HeaderOrder{}, nil)
 }
 
-func (h Header) writeSubset(w io.Writer, exclude map[string]bool, trace *httptrace.ClientTrace) error {
+func (h Header) writeSubset(w io.Writer, exclude map[string]bool, order textproto.HeaderOrder, trace *httptrace.ClientTrace) error {
 	ws, ok := w.(io.StringWriter)
 	if !ok {
 		ws = stringWriter{w}
 	}
-	kvs, sorter := h.sortedKeyValues(exclude)
+	kvs, sorter := h.sortedKeyValues(exclude, order)
 	var formattedVals []string
 	for _, kv := range kvs {
 		if !httpguts.ValidHeaderFieldName(kv.key) {

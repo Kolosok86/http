@@ -90,8 +90,6 @@ func badStringError(what, val string) error { return fmt.Errorf("%s %q", what, v
 
 // Headers that Request.Write handles itself and should be skipped.
 var reqWriteExcludeHeader = map[string]bool{
-	"Host":              true, // not in Header map anyway
-	"User-Agent":        true,
 	"Content-Length":    true,
 	"Transfer-Encoding": true,
 	"Trailer":           true,
@@ -621,29 +619,14 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
 		return err
 	}
 
-	// Header lines
-	_, err = fmt.Fprintf(w, "Host: %s\r\n", host)
-	if err != nil {
-		return err
-	}
-	if trace != nil && trace.WroteHeaderField != nil {
-		trace.WroteHeaderField("Host", []string{host})
+	// if user agent field is not present, add it
+	if _, ok := r.Header["User-Agent"]; !ok {
+		r.Header.Set("User-Agent", "Go-http-client/1.1")
 	}
 
-	// Use the defaultUserAgent unless the Header contains one, which
-	// may be blank to not send the header.
-	userAgent := defaultUserAgent
-	if r.Header.has("User-Agent") {
-		userAgent = r.Header.Get("User-Agent")
-	}
-	if userAgent != "" {
-		_, err = fmt.Fprintf(w, "User-Agent: %s\r\n", userAgent)
-		if err != nil {
-			return err
-		}
-		if trace != nil && trace.WroteHeaderField != nil {
-			trace.WroteHeaderField("User-Agent", []string{userAgent})
-		}
+	// Header lines
+	if _, ok := r.Header["Host"]; !ok {
+		r.Header.Set("Host", host)
 	}
 
 	// Process Body,ContentLength,Close,Trailer
@@ -656,13 +639,15 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
 		return err
 	}
 
-	err = r.Header.writeSubset(w, reqWriteExcludeHeader, trace)
+	err = r.Header.writeSubset(w, reqWriteExcludeHeader, r.Order, trace)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(extraHeaders, r.Header, r.Order)
+
 	if extraHeaders != nil {
-		err = extraHeaders.write(w, trace)
+		err = extraHeaders.write(w, trace, r.Order)
 		if err != nil {
 			return err
 		}

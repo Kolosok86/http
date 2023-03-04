@@ -2576,7 +2576,8 @@ func (pc *persistConn) roundTrip(req *transportRequest) (resp *Response, err err
 	if !pc.t.DisableCompression &&
 		req.Header.Get("Accept-Encoding") == "" &&
 		req.Header.Get("Range") == "" &&
-		req.Method != "HEAD" {
+		req.Method != "HEAD" &&
+		strings.Contains(req.Header.Get("Accept-Encoding"), "gzip") {
 		// Request gzip only, not deflate. Deflate is ambiguous and
 		// not as universally supported anyway.
 		// See: https://zlib.net/zlib_faq.html#faq39
@@ -2590,7 +2591,6 @@ func (pc *persistConn) roundTrip(req *transportRequest) (resp *Response, err err
 		// auto-decoding a portion of a gzipped document will just fail
 		// anyway. See https://golang.org/issue/8923
 		requestedGzip = true
-		req.extraHeaders().Set("Accept-Encoding", "gzip")
 	}
 
 	var continueCh chan struct{}
