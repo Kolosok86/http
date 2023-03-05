@@ -9,9 +9,9 @@ import (
 	"errors"
 	"io"
 	"net"
-	"net/http"
 	"sync"
 
+	"github.com/Kolosok86/http"
 	"github.com/Kolosok86/http/textproto"
 )
 

@@ -9,13 +9,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/http"
 	"net/url"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http"
 	"github.com/Kolosok86/http/internal/ascii"
 )
 

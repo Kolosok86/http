@@ -12,12 +12,13 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/Kolosok86/http"
 )
 
 // hello world, the web server

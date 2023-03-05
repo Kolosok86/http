@@ -14,7 +14,6 @@ import (
 	"compress/gzip"
 	"container/list"
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -31,6 +30,7 @@ import (
 	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/textproto"
+	tls "github.com/refraction-networking/utls"
 	"golang.org/x/net/http/httpguts"
 	"golang.org/x/net/http/httpproxy"
 )

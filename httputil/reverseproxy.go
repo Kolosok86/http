@@ -14,12 +14,12 @@ import (
 	"log"
 	"mime"
 	"net"
-	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http"
 	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/textproto"

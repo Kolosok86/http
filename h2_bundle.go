@@ -25,7 +25,6 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/rand"
-	"crypto/tls"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -46,6 +45,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	tls "github.com/refraction-networking/utls"
 	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/textproto"
 	"golang.org/x/net/http/httpguts"

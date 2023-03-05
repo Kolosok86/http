@@ -11,7 +11,6 @@ package http
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -26,6 +25,7 @@ import (
 	"time"
 
 	"github.com/Kolosok86/http/internal/ascii"
+	tls "github.com/refraction-networking/utls"
 )
 
 // A Client is an HTTP client. Its zero value (DefaultClient) is a

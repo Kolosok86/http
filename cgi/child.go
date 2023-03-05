@@ -9,16 +9,17 @@ package cgi
 
 import (
 	"bufio"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
 	"net"
-	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/Kolosok86/http"
+	tls "github.com/refraction-networking/utls"
 )
 
 // Request returns the HTTP request as represented in the current

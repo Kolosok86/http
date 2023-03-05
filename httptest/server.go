@@ -7,19 +7,19 @@
 package httptest
 
 import (
-	"crypto/tls"
 	"crypto/x509"
 	"flag"
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Kolosok86/http"
 	"github.com/Kolosok86/http/internal/testcert"
+	tls "github.com/refraction-networking/utls"
 )
 
 // A Server is an HTTP server listening on a system-chosen port on the

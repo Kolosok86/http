@@ -69,7 +69,6 @@ import (
 	"html"
 	"io"
 	"log"
-	"net/http"
 	"net/url"
 	"os"
 	"runtime"
@@ -80,6 +79,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Kolosok86/http"
 	"github.com/Kolosok86/http/internal/profile"
 )
 

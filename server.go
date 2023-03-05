@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -30,6 +29,7 @@ import (
 	"time"
 
 	"github.com/Kolosok86/http/textproto"
+	tls "github.com/refraction-networking/utls"
 	"golang.org/x/net/http/httpguts"
 )
 

@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -27,6 +26,7 @@ import (
 	"github.com/Kolosok86/http/internal/ascii"
 	"github.com/Kolosok86/http/internal/multipart"
 	"github.com/Kolosok86/http/textproto"
+	tls "github.com/refraction-networking/utls"
 	"golang.org/x/net/idna"
 )
 
@@ -643,8 +643,6 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(extraHeaders, r.Header, r.Order)
 
 	if extraHeaders != nil {
 		err = extraHeaders.write(w, trace, r.Order)
