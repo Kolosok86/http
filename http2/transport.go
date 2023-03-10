@@ -40,12 +40,12 @@ import (
 const (
 	// transportDefaultConnFlow is how many connection-level flow control
 	// tokens we give the server at start-up, past the default 64k.
-	transportDefaultConnFlow = 1 << 30
+	transportDefaultConnFlow = 0xEF0001
 
 	// transportDefaultStreamFlow is how many stream-level flow
 	// control tokens we announce to the peer, and how many bytes
 	// we buffer per stream.
-	transportDefaultStreamFlow = 4 << 20
+	transportDefaultStreamFlow = 6 << 20
 
 	defaultUserAgent = "Go-http-client/2.0"
 
@@ -738,7 +738,7 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 		readerDone:            make(chan struct{}),
 		nextStreamID:          1,
 		maxFrameSize:          16 << 10,                    // spec default
-		initialWindowSize:     65535,                       // spec default
+		initialWindowSize:     65536,                       // spec default
 		maxConcurrentStreams:  initialMaxConcurrentStreams, // "infinite", per spec. Use a smaller value until we have received server settings.
 		peerMaxHeaderListSize: 0xffffffffffffffff,          // "infinite", per spec. Use 2^64-1 instead.
 		streams:               make(map[uint32]*clientStream),
@@ -791,17 +791,15 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 	}
 
 	initialSettings := []Setting{
+		{ID: SettingHeaderTableSize, Val: initialWindowSize},
 		{ID: SettingEnablePush, Val: 0},
 		{ID: SettingInitialWindowSize, Val: transportDefaultStreamFlow},
+		{ID: SettingMaxConcurrentStreams, Val: defaultMaxConcurrentStreams},
+		{ID: SettingMaxHeaderListSize, Val: defaultMaxReadFrameSize},
 	}
+
 	if max := t.maxFrameReadSize(); max != 0 {
 		initialSettings = append(initialSettings, Setting{ID: SettingMaxFrameSize, Val: max})
-	}
-	if max := t.maxHeaderListSize(); max != 0 {
-		initialSettings = append(initialSettings, Setting{ID: SettingMaxHeaderListSize, Val: max})
-	}
-	if maxHeaderTableSize != initialHeaderTableSize {
-		initialSettings = append(initialSettings, Setting{ID: SettingHeaderTableSize, Val: maxHeaderTableSize})
 	}
 
 	cc.bw.Write(clientPreface)
@@ -1882,54 +1880,83 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 		// target URI (the path-absolute production and optionally a '?' character
 		// followed by the query production (see Sections 3.3 and 3.4 of
 		// [RFC3986]).
-		f(":authority", host)
 		m := req.Method
 		if m == "" {
 			m = http.MethodGet
 		}
-		f(":method", m)
-		if req.Method != "CONNECT" {
-			f(":path", path)
-			f(":scheme", req.URL.Scheme)
+
+		// follow based on pseudo header order
+		for _, p := range req.PseudoOrder.Order {
+			switch p {
+			case ":authority":
+				f(":authority", host)
+			case ":method":
+				f(":method", req.Method)
+			case ":path":
+				if req.Method != "CONNECT" {
+					f(":path", path)
+				}
+			case ":scheme":
+				if req.Method != "CONNECT" {
+					f(":scheme", req.URL.Scheme)
+				}
+
+			default:
+				continue
+			}
 		}
+
+		if len(req.PseudoOrder.Order) == 0 {
+			f(":method", m)
+			f(":authority", host)
+
+			if req.Method != "CONNECT" {
+				f(":scheme", req.URL.Scheme)
+				f(":path", path)
+			}
+		}
+
 		if trailers != "" {
 			f("trailer", trailers)
 		}
 
+		kvs, _ := req.Header.SortedKeyValues(make(map[string]bool), req.HeaderOrder)
+
 		var didUA bool
-		for k, vv := range req.Header {
-			if asciiEqualFold(k, "host") || asciiEqualFold(k, "content-length") {
+		for _, kv := range kvs {
+			if asciiEqualFold(kv.Key, "host") || asciiEqualFold(kv.Key, "content-length") {
 				// Host is :authority, already sent.
 				// Content-Length is automatic, set below.
 				continue
-			} else if asciiEqualFold(k, "connection") ||
-				asciiEqualFold(k, "proxy-connection") ||
-				asciiEqualFold(k, "transfer-encoding") ||
-				asciiEqualFold(k, "upgrade") ||
-				asciiEqualFold(k, "keep-alive") {
+			} else if asciiEqualFold(kv.Key, "connection") ||
+				asciiEqualFold(kv.Key, "proxy-connection") ||
+				asciiEqualFold(kv.Key, "transfer-encoding") ||
+				asciiEqualFold(kv.Key, "upgrade") ||
+				asciiEqualFold(kv.Key, "keep-alive") {
 				// Per 8.1.2.2 Connection-Specific Header
 				// Fields, don't send connection-specific
 				// fields. We have already checked if any
 				// are error-worthy so just ignore the rest.
 				continue
-			} else if asciiEqualFold(k, "user-agent") {
+			} else if asciiEqualFold(kv.Key, "user-agent") {
 				// Match Go's http1 behavior: at most one
 				// User-Agent. If set to nil or empty string,
 				// then omit it. Otherwise if not mentioned,
 				// include the default (below).
 				didUA = true
-				if len(vv) < 1 {
+				if len(kv.Values) < 1 {
 					continue
 				}
-				vv = vv[:1]
-				if vv[0] == "" {
+
+				kv.Values = kv.Values[:1]
+				if kv.Values[0] == "" {
 					continue
 				}
-			} else if asciiEqualFold(k, "cookie") {
+			} else if asciiEqualFold(kv.Key, "cookie") {
 				// Per 8.1.2.5 To allow for better compression efficiency, the
 				// Cookie header field MAY be split into separate header fields,
 				// each with one or more cookie-pairs.
-				for _, v := range vv {
+				for _, v := range kv.Values {
 					for {
 						p := strings.IndexByte(v, ';')
 						if p < 0 {
@@ -1950,16 +1977,11 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 				continue
 			}
 
-			for _, v := range vv {
-				f(k, v)
+			for _, v := range kv.Values {
+				f(kv.Key, v)
 			}
 		}
-		if shouldSendReqContentLength(req.Method, contentLength) {
-			f("content-length", strconv.FormatInt(contentLength, 10))
-		}
-		if addGzipHeader {
-			f("accept-encoding", "gzip")
-		}
+
 		if !didUA {
 			f("user-agent", defaultUserAgent)
 		}
@@ -1997,28 +2019,6 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 	})
 
 	return cc.hbuf.Bytes(), nil
-}
-
-// shouldSendReqContentLength reports whether the http2.Transport should send
-// a "content-length" request header. This logic is basically a copy of the net/http
-// transferWriter.shouldSendContentLength.
-// The contentLength is the corrected contentLength (so 0 means actually 0, not unknown).
-// -1 means unknown.
-func shouldSendReqContentLength(method string, contentLength int64) bool {
-	if contentLength > 0 {
-		return true
-	}
-	if contentLength < 0 {
-		return false
-	}
-	// For zero bodies, whether we send a content-length depends on the method.
-	// It also kinda doesn't matter for http2 either way, with END_STREAM.
-	switch method {
-	case "POST", "PUT", "PATCH":
-		return true
-	default:
-		return false
-	}
 }
 
 // requires cc.wmu be held.

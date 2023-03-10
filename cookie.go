@@ -56,7 +56,7 @@ const (
 	SameSiteNoneMode
 )
 
-// readSetCookies parses all "Set-Cookie" values from
+// readSetCookies parses all "Set-Cookie" Values from
 // the header h and returns the successfully parsed Cookies.
 func readSetCookies(h Header) []*Cookie {
 	cookieCount := len(h["Set-Cookie"])
@@ -271,7 +271,7 @@ func (c *Cookie) Valid() error {
 	return nil
 }
 
-// readCookies parses all "Cookie" values from the header h and
+// readCookies parses all "Cookie" Values from the header h and
 // returns the successfully parsed Cookies.
 //
 // if filter isn't empty, only cookies of that name are returned.
@@ -397,7 +397,7 @@ func sanitizeCookieName(n string) string {
 //	          ; whitespace DQUOTE, comma, semicolon,
 //	          ; and backslash
 //
-// We loosen this as spaces and commas are common in cookie values
+// We loosen this as spaces and commas are common in cookie Values
 // but we produce a quoted cookie-value if and only if v contains
 // commas or spaces.
 // See https://golang.org/issue/7243 for the discussion.

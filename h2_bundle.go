@@ -45,9 +45,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	tls "github.com/refraction-networking/utls"
 	"github.com/Kolosok86/http/httptrace"
 	"github.com/Kolosok86/http/textproto"
+	tls "github.com/refraction-networking/utls"
 	"golang.org/x/net/http/httpguts"
 	"golang.org/x/net/http2/hpack"
 	"golang.org/x/net/idna"
@@ -449,7 +449,7 @@ const (
 // https://tools.ietf.org/html/rfc7540#appendix-A
 // Reject cipher suites from Appendix A.
 // "This list includes those cipher suites that do not
-// offer an ephemeral key exchange and those that are
+// offer an ephemeral Key exchange and those that are
 // based on the TLS null, stream or block cipher type"
 func http2isBadCipher(cipher uint16) bool {
 	switch cipher {
@@ -766,7 +766,7 @@ type http2clientConnPool struct {
 	mu sync.Mutex // TODO: maybe switch to RWMutex
 	// TODO: add support for sharing conns based on cert names
 	// (e.g. share conn for googleapis.com and appspot.com)
-	conns        map[string][]*http2ClientConn // key is host:port
+	conns        map[string][]*http2ClientConn // Key is host:port
 	dialing      map[string]*http2dialCall     // currently in-flight dials
 	keys         map[*http2ClientConn][]string
 	addConnCalls map[string]*http2addConnCall // in-flight addConnIfNeeded calls
@@ -871,8 +871,8 @@ func (c *http2dialCall) dial(ctx context.Context, addr string) {
 	close(c.done)
 }
 
-// addConnIfNeeded makes a NewClientConn out of c if a connection for key doesn't
-// already exist. It coalesces concurrent calls with the same key.
+// addConnIfNeeded makes a NewClientConn out of c if a connection for Key doesn't
+// already exist. It coalesces concurrent calls with the same Key.
 // This is used by the http1 Transport code when it creates a new connection. Because
 // the http1 Transport doesn't de-dup TCP dials to outbound hosts (because it doesn't know
 // the protocol), it can get into a situation where it has multiple TLS connections.
@@ -2836,7 +2836,7 @@ type http2MetaHeadersFrame struct {
 	//
 	// Fields are guaranteed to be in the correct http2 order and
 	// not have unknown pseudo header fields or invalid header
-	// field names or values. Required pseudo header fields may be
+	// field names or Values. Required pseudo header fields may be
 	// missing, however. Use the MetaHeadersFrame.Pseudo accessor
 	// method access pseudo headers.
 	Fields []hpack.HeaderField
@@ -2922,7 +2922,7 @@ func (fr *http2Framer) maxHeaderStringLen() int {
 
 // readMetaFrame returns 0 or more CONTINUATION frames from fr and
 // merge them into the provided hf and returns a MetaHeadersFrame
-// with the decoded hpack values.
+// with the decoded hpack Values.
 func (fr *http2Framer) readMetaFrame(hf *http2HeadersFrame) (*http2MetaHeadersFrame, error) {
 	if fr.AllowIllegalReads {
 		return nil, errors.New("illegal use of AllowIllegalReads with ReadMetaHeaders")
@@ -3482,7 +3482,7 @@ func (s http2SettingID) String() string {
 }
 
 // validWireHeaderFieldName reports whether v is a valid header field
-// name (key). See httpguts.ValidHeaderName for the base rules.
+// name (Key). See httpguts.ValidHeaderName for the base rules.
 //
 // Further, http2 says:
 //
@@ -4018,7 +4018,7 @@ func (s *http2Server) maxEncoderHeaderTableSize() uint32 {
 // the connection is closed to prevent memory exhaustion attacks.
 func (s *http2Server) maxQueuedControlFrames() int {
 	// TODO: if anybody asks, add a Server field, and remember to define the
-	// behavior of negative values.
+	// behavior of negative Values.
 	return http2maxQueuedControlFrames
 }
 
@@ -4151,7 +4151,7 @@ type http2ServeConnOpts struct {
 	Context context.Context
 
 	// BaseConfig optionally sets the base configuration
-	// for values. If nil, defaults are used.
+	// for Values. If nil, defaults are used.
 	BaseConfig *Server
 
 	// Handler specifies which handler to use for processing
@@ -4213,7 +4213,7 @@ func (o *http2ServeConnOpts) handler() Handler {
 // ServeConn does not support h2c by itself. Any h2c support must be
 // implemented in terms of providing a suitably-behaving net.Conn.
 //
-// The opts parameter is optional. If nil, default values are used.
+// The opts parameter is optional. If nil, default Values are used.
 func (s *http2Server) ServeConn(c net.Conn, opts *http2ServeConnOpts) {
 	baseCtx, cancel := http2serverConnBaseContext(c, opts)
 	defer cancel()
@@ -4608,7 +4608,7 @@ func (sc *http2serverConn) canonicalHeader(v string) string {
 		sc.canonHeader = make(map[string]string)
 	}
 	cv = CanonicalHeaderKey(v)
-	size := 100 + len(v)*2 // 100 bytes of map overhead + key + value
+	size := 100 + len(v)*2 // 100 bytes of map overhead + Key + value
 	if sc.canonHeaderKeysSize+size <= http2maxCachedCanonicalHeadersKeysSize {
 		sc.canonHeader[v] = cv
 		sc.canonHeaderKeysSize += size
@@ -4841,7 +4841,7 @@ func (sc *http2serverConn) awaitGracefulShutdown(sharedCh <-chan struct{}, priva
 
 type http2serverMessage int
 
-// Message values sent to serveMsgCh.
+// Message Values sent to serveMsgCh.
 var (
 	http2settingsTimerMsg    = new(http2serverMessage)
 	http2idleTimerMsg        = new(http2serverMessage)
@@ -6476,7 +6476,7 @@ func (rws *http2responseWriterState) writeChunk(p []byte) (n int, err error) {
 // TrailerPrefix is a magic prefix for ResponseWriter.Header map keys
 // that, if present, signals that the map entry is actually for
 // the response trailers, and not the response headers. The prefix
-// is stripped after the ServeHTTP call finishes and the values are
+// is stripped after the ServeHTTP call finishes and the Values are
 // sent in the trailers.
 //
 // This mechanism is intended only for trailers that are not known
@@ -6502,8 +6502,8 @@ const http2TrailerPrefix = "Trailer:"
 // user of Trailers in the wild: gRPC (using them only over http2),
 // and gRPC libraries permit setting trailers mid-stream without
 // predeclaring them. So: change of plans. We still permit the old
-// way, but we also permit this hack: if a Header() key begins with
-// "Trailer:", the suffix of that key is a Trailer. Because ':' is an
+// way, but we also permit this hack: if a Header() Key begins with
+// "Trailer:", the suffix of that Key is a Trailer. Because ':' is an
 // invalid token byte anyway, there is no ambiguity. (And it's already
 // filtered out) It's mildly hacky, but not terrible.
 //
@@ -8169,7 +8169,7 @@ func http2commaSeparatedTrailers(req *Request) (string, error) {
 		k = http2canonicalHeader(k)
 		switch k {
 		case "Transfer-Encoding", "Trailer", "Content-Length":
-			return "", fmt.Errorf("invalid Trailer key %q", k)
+			return "", fmt.Errorf("invalid Trailer Key %q", k)
 		}
 		keys = append(keys, k)
 	}
@@ -8640,7 +8640,7 @@ func (cc *http2ClientConn) writeHeaders(streamID uint32, endStream bool, maxFram
 	return cc.werr
 }
 
-// internal error values; they don't escape to callers
+// internal error Values; they don't escape to callers
 var (
 	// abort request body write; don't send cancel
 	http2errStopReqBodyWrite = errors.New("http2: aborting request body write")
@@ -9404,7 +9404,7 @@ func (rl *http2clientConnReadLoop) handleResponse(cs *http2clientStream, f *http
 		} else {
 			vv := header[key]
 			if vv == nil && len(strs) > 0 {
-				// More than likely this will be a single-element key.
+				// More than likely this will be a single-element Key.
 				// Most headers aren't multi-valued.
 				// Set the capacity on strs[0] to 1, so any future append
 				// won't extend the slice into the other strings.
@@ -10793,7 +10793,7 @@ type http2PriorityWriteSchedulerConfig struct {
 	//   different from what is intended. To avoid these problems, an endpoint
 	//   SHOULD retain stream prioritization state for a period after streams
 	//   become closed. The longer state is retained, the lower the chance that
-	//   streams are assigned incorrect or default priority values."
+	//   streams are assigned incorrect or default priority Values."
 	MaxClosedNodesInTree int
 
 	// MaxIdleNodesInTree controls the maximum number of idle streams to

@@ -65,9 +65,9 @@ const (
 	// https://httpwg.org/specs/rfc7540.html#SettingValues
 	initialHeaderTableSize = 4096
 
-	initialWindowSize = 65535 // 6.9.2 Initial Flow Control Window Size
+	initialWindowSize = 65536 // 6.9.2 Initial Flow Control Window Size
 
-	defaultMaxReadFrameSize = 1 << 20
+	defaultMaxReadFrameSize = 0x40000
 )
 
 var (

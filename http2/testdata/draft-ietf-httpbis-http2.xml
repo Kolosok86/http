@@ -204,13 +204,13 @@
 
       <section title="Conventions and Terminology">
         <t>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD
+          The Key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD
           NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as
           described in <xref target="RFC2119">RFC 2119</xref>.
         </t>
         <t>
-          All numeric values are in network byte order.  Values are unsigned unless otherwise
-          indicated.  Literal values are provided in decimal or hexadecimal as appropriate.
+          All numeric Values are in network byte order.  Values are unsigned unless otherwise
+          indicated.  Literal Values are provided in decimal or hexadecimal as appropriate.
           Hexadecimal literals are prefixed with <spanx style="verb">0x</spanx> to distinguish them
           from decimal literals.
         </t>
@@ -415,7 +415,7 @@ Upgrade: h2c
         </t>
         <t>
           The HTTP/1.1 request that is sent prior to upgrade is assigned stream identifier 1 and is
-          assigned <xref target="pri-default">default priority values</xref>.  Stream 1 is
+          assigned <xref target="pri-default">default priority Values</xref>.  Stream 1 is
           implicitly half closed from the client toward the server, since the request is completed
           as an HTTP/1.1 request.  After commencing the HTTP/2 connection, stream 1 is used for the
           response.
@@ -455,10 +455,10 @@ HTTP2-Settings    = token68
             downstream.
           </t>
           <t>
-            A server decodes and interprets these values as it would any other
+            A server decodes and interprets these Values as it would any other
             <x:ref>SETTINGS</x:ref> frame.  <xref target="SettingsSync">Acknowledgement of the
             SETTINGS parameters</xref> is not necessary, since a 101 response serves as implicit
-            acknowledgment.  Providing these values in the Upgrade request gives a client an
+            acknowledgment.  Providing these Values in the Upgrade request gives a client an
             opportunity to provide parameters prior to receiving any frames from the server.
           </t>
         </section>
@@ -675,7 +675,7 @@ HTTP2-Settings    = token68
 
       <section anchor="HeaderBlock" title="Header Compression and Decompression">
         <t>
-          Just as in HTTP/1, a header field in HTTP/2 is a name with one or more associated values.
+          Just as in HTTP/1, a header field in HTTP/2 is a name with one or more associated Values.
           They are used within HTTP request and response messages as well as server push operations
           (see <xref target="PushResources" />).
         </t>
@@ -1252,7 +1252,7 @@ HTTP2-Settings    = token68
           particular order using priority.  Expressing priority is therefore only ever a suggestion.
         </t>
         <t>
-          Providing prioritization information is optional, so default values are used if no
+          Providing prioritization information is optional, so default Values are used if no
           explicit indicator is provided (<xref target="pri-default"/>).
         </t>
 
@@ -1397,7 +1397,7 @@ HTTP2-Settings    = token68
           <t>
             To avoid these problems, an endpoint SHOULD retain stream prioritization state for a
             period after streams become closed.  The longer state is retained, the lower the chance
-            that streams are assigned incorrect or default priority values.
+            that streams are assigned incorrect or default priority Values.
           </t>
           <t>
             This could create a large state burden for an endpoint, so this state MAY be limited.
@@ -1523,7 +1523,7 @@ HTTP2-Settings    = token68
           <xref target="iana-errors">error codes</xref>.
         </t>
         <t>
-          Implementations MUST ignore unknown or unsupported values in all extensible protocol
+          Implementations MUST ignore unknown or unsupported Values in all extensible protocol
           elements.  Implementations MUST discard frames that have unknown or unsupported types.
           This means that any of these extension points can be safely used by extensions without
           prior arrangement or negotiation.  However, extension frames that appear in the middle of
@@ -1904,7 +1904,7 @@ HTTP2-Settings    = token68
         </t>
         <t>
           SETTINGS parameters are not negotiated; they describe characteristics of the sending peer,
-          which are used by the receiving peer. Different values for the same parameter can be
+          which are used by the receiving peer. Different Values for the same parameter can be
           advertised by each peer. For example, a client might set a high initial flow control
           window, whereas a server might set a lower value to conserve resources.
         </t>
@@ -2070,15 +2070,15 @@ HTTP2-Settings    = token68
 
         <section anchor="SettingsSync" title="Settings Synchronization">
           <t>
-            Most values in SETTINGS benefit from or require an understanding of when the peer has
-            received and applied the changed parameter values. In order to provide
+            Most Values in SETTINGS benefit from or require an understanding of when the peer has
+            received and applied the changed parameter Values. In order to provide
             such synchronization timepoints, the recipient of a SETTINGS frame in which the ACK flag
             is not set MUST apply the updated parameters as soon as possible upon receipt.
           </t>
           <t>
-            The values in the SETTINGS frame MUST be processed in the order they appear, with no
-            other frame processing between values.  Unsupported parameters MUST be ignored.  Once
-            all values have been processed, the recipient MUST immediately emit a SETTINGS frame
+            The Values in the SETTINGS frame MUST be processed in the order they appear, with no
+            other frame processing between Values.  Unsupported parameters MUST be ignored.  Once
+            all Values have been processed, the recipient MUST immediately emit a SETTINGS frame
             with the ACK flag set. Upon receiving a SETTINGS frame with the ACK flag set, the sender
             of the altered parameters can rely on the setting having been applied.
           </t>
@@ -2825,7 +2825,7 @@ HTTP2-Settings    = token68
 
         <section anchor="HttpHeaders" title="HTTP Header Fields">
           <t>
-            HTTP header fields carry information as a series of key-value pairs. For a listing of
+            HTTP header fields carry information as a series of Key-value pairs. For a listing of
             registered HTTP headers, see the Message Header Field Registry maintained at <eref
             target="https://www.iana.org/assignments/message-headers"/>.
           </t>
@@ -3508,7 +3508,7 @@ HTTP2-Settings    = token68
         </t>
         <t>
           A client MAY open multiple connections to the same IP address and TCP port using different
-          <xref target="TLS-EXT">Server Name Indication</xref> values or to provide different TLS
+          <xref target="TLS-EXT">Server Name Indication</xref> Values or to provide different TLS
           client certificates, but SHOULD avoid creating multiple connections with the same
           configuration.
         </t>
@@ -3637,9 +3637,9 @@ HTTP2-Settings    = token68
         <section title="TLS Cipher Suites">
           <t>
             The set of TLS cipher suites that are permitted in HTTP/2 is restricted.  HTTP/2 MUST
-            only be used with cipher suites that have ephemeral key exchange, such as the <xref
+            only be used with cipher suites that have ephemeral Key exchange, such as the <xref
             target="TLS12">ephemeral Diffie-Hellman (DHE)</xref> or the <xref
-            target="RFC4492">elliptic curve variant (ECDHE)</xref>.  Ephemeral key exchange MUST
+            target="RFC4492">elliptic curve variant (ECDHE)</xref>.  Ephemeral Key exchange MUST
             have a minimum size of 2048 bits for DHE or security level of 128 bits for ECDHE.
             Clients MUST accept DHE sizes of up to 4096 bits.  HTTP MUST NOT be used with cipher
             suites that use stream or block ciphers.  Authenticated Encryption with Additional Data
@@ -3704,7 +3704,7 @@ HTTP2-Settings    = token68
 
       <section title="Intermediary Encapsulation Attacks">
         <t>
-          HTTP/2 header field names and values are encoded as sequences of octets with a length
+          HTTP/2 header field names and Values are encoded as sequences of octets with a length
           prefix.  This enables HTTP/2 to carry any string of octets as the name or value of a
           header field.  An intermediary that translates HTTP/2 requests or responses into HTTP/1.1
           directly could permit the creation of corrupted HTTP/1.1 messages.  An attacker might
@@ -3712,14 +3712,14 @@ HTTP2-Settings    = token68
           header fields, extra header fields, or even new messages that are entirely falsified.
         </t>
         <t>
-          Header field names or values that contain characters not permitted by HTTP/1.1, including
+          Header field names or Values that contain characters not permitted by HTTP/1.1, including
           carriage return (ASCII 0xd) or line feed (ASCII 0xa) MUST NOT be translated verbatim by an
           intermediary, as stipulated in <xref target="RFC7230" x:rel="#field.parsing" x:fmt=","/>.
         </t>
         <t>
           Translation from HTTP/1.x to HTTP/2 does not produce the same opportunity to an attacker.
           Intermediaries that perform translation to HTTP/2 MUST remove any instances of the <spanx
-          style="verb">obs-fold</spanx> production from header field values.
+          style="verb">obs-fold</spanx> production from header field Values.
         </t>
       </section>
 
@@ -3815,7 +3815,7 @@ HTTP2-Settings    = token68
             endpoints MAY choose to send header blocks that exceed this limit and risk having the
             request or response being treated as malformed.  This setting specific to a connection,
             so any request or response could encounter a hop with a lower, unknown limit.  An
-            intermediary can attempt to avoid this problem by passing on values presented by
+            intermediary can attempt to avoid this problem by passing on Values presented by
             different peers, but they are not obligated to do so.
           </t>
           <t>
@@ -3948,7 +3948,7 @@ HTTP2-Settings    = token68
           This document establishes a registry for HTTP/2 frame type codes.  The "HTTP/2 Frame
           Type" registry manages an 8-bit space.  The "HTTP/2 Frame Type" registry operates under
           either of the <xref target="RFC5226">"IETF Review" or "IESG Approval" policies</xref> for
-          values between 0x00 and 0xef, with values between 0xf0 and 0xff being reserved for
+          Values between 0x00 and 0xef, with Values between 0xf0 and 0xff being reserved for
           experimental use.
         </t>
         <t>
@@ -3991,8 +3991,8 @@ HTTP2-Settings    = token68
         <t>
           This document establishes a registry for HTTP/2 settings.  The "HTTP/2 Settings" registry
           manages a 16-bit space.  The "HTTP/2 Settings" registry operates under the <xref
-          target="RFC5226">"Expert Review" policy</xref> for values in the range from 0x0000 to
-          0xefff, with values between and 0xf000 and 0xffff being reserved for experimental use.
+          target="RFC5226">"Expert Review" policy</xref> for Values in the range from 0x0000 to
+          0xefff, with Values between and 0xf000 and 0xffff being reserved for experimental use.
         </t>
         <t>
           New registrations are advised to provide the following information:

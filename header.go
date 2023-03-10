@@ -17,49 +17,49 @@ import (
 	"golang.org/x/net/http/httpguts"
 )
 
-// A Header represents the key-value pairs in an HTTP header.
+// A Header represents the Key-value pairs in an HTTP header.
 //
 // The keys should be in canonical form, as returned by
 // CanonicalHeaderKey.
 type Header map[string][]string
 
-// Add adds the key, value pair to the header.
-// It appends to any existing values associated with key.
-// The key is case insensitive; it is canonicalized by
+// Add adds the Key, value pair to the header.
+// It appends to any existing Values associated with Key.
+// The Key is case insensitive; it is canonicalized by
 // CanonicalHeaderKey.
 func (h Header) Add(key, value string) {
 	textproto.MIMEHeader(h).Add(key, value)
 }
 
-// Set sets the header entries associated with key to the
-// single element value. It replaces any existing values
-// associated with key. The key is case insensitive; it is
+// Set sets the header entries associated with Key to the
+// single element value. It replaces any existing Values
+// associated with Key. The Key is case insensitive; it is
 // canonicalized by textproto.CanonicalMIMEHeaderKey.
 // To use non-canonical keys, assign to the map directly.
 func (h Header) Set(key, value string) {
 	textproto.MIMEHeader(h).Set(key, value)
 }
 
-// Get gets the first value associated with the given key. If
-// there are no values associated with the key, Get returns "".
+// Get gets the first value associated with the given Key. If
+// there are no Values associated with the Key, Get returns "".
 // It is case insensitive; textproto.CanonicalMIMEHeaderKey is
-// used to canonicalize the provided key. Get assumes that all
+// used to canonicalize the provided Key. Get assumes that all
 // keys are stored in canonical form. To use non-canonical keys,
 // access the map directly.
 func (h Header) Get(key string) string {
 	return textproto.MIMEHeader(h).Get(key)
 }
 
-// Values returns all values associated with the given key.
+// Values returns all Values associated with the given Key.
 // It is case insensitive; textproto.CanonicalMIMEHeaderKey is
-// used to canonicalize the provided key. To use non-canonical
+// used to canonicalize the provided Key. To use non-canonical
 // keys, access the map directly.
 // The returned slice is not a copy.
 func (h Header) Values(key string) []string {
 	return textproto.MIMEHeader(h).Values(key)
 }
 
-// get is like Get, but key must already be in CanonicalHeaderKey form.
+// get is like Get, but Key must already be in CanonicalHeaderKey form.
 func (h Header) get(key string) string {
 	if v := h[key]; len(v) > 0 {
 		return v[0]
@@ -67,15 +67,15 @@ func (h Header) get(key string) string {
 	return ""
 }
 
-// has reports whether h has the provided key defined, even if it's
+// has reports whether h has the provided Key defined, even if it's
 // set to 0-length slice.
 func (h Header) has(key string) bool {
 	_, ok := h[key]
 	return ok
 }
 
-// Del deletes the values associated with key.
-// The key is case insensitive; it is canonicalized by
+// Del deletes the Values associated with Key.
+// The Key is case insensitive; it is canonicalized by
 // CanonicalHeaderKey.
 func (h Header) Del(key string) {
 	textproto.MIMEHeader(h).Del(key)
@@ -96,17 +96,17 @@ func (h Header) Clone() Header {
 		return nil
 	}
 
-	// Find total number of values.
+	// Find total number of Values.
 	nv := 0
 	for _, vv := range h {
 		nv += len(vv)
 	}
-	sv := make([]string, nv) // shared backing array for headers' values
+	sv := make([]string, nv) // shared backing array for headers' Values
 	h2 := make(Header, len(h))
 	for k, vv := range h {
 		if vv == nil {
-			// Preserve nil values. ReverseProxy distinguishes
-			// between nil and zero-length header values.
+			// Preserve nil Values. ReverseProxy distinguishes
+			// between nil and zero-length header Values.
 			h2[k] = nil
 			continue
 		}
@@ -148,12 +148,12 @@ func (w stringWriter) WriteString(s string) (n int, err error) {
 }
 
 type keyValues struct {
-	key    string
-	values []string
+	Key    string
+	Values []string
 }
 
 // A headerSorter implements sort.Interface by sorting a []keyValues
-// by key. It's used as a pointer, so it can fit in a sort.Interface
+// by Key. It's used as a pointer, so it can fit in a sort.Interface
 // interface value without allocation.
 type headerSorter struct {
 	order textproto.HeaderOrder
@@ -165,14 +165,14 @@ func (s *headerSorter) Swap(i, j int) { s.kvs[i], s.kvs[j] = s.kvs[j], s.kvs[i] 
 func (s *headerSorter) Less(i, j int) bool {
 	// If the order isn't defined, sort lexicographically.
 	if len(s.order.Order) == 0 {
-		return s.kvs[i].key < s.kvs[j].key
+		return s.kvs[i].Key < s.kvs[j].Key
 	}
 
-	ii := s.order.FindIndex(strings.ToLower(s.kvs[i].key))
-	ji := s.order.FindIndex(strings.ToLower(s.kvs[j].key))
+	ii := s.order.FindIndex(strings.ToLower(s.kvs[i].Key))
+	ji := s.order.FindIndex(strings.ToLower(s.kvs[j].Key))
 
 	if ii == -1 && ji == -1 {
-		return s.kvs[i].key < s.kvs[j].key
+		return s.kvs[i].Key < s.kvs[j].Key
 	} else if ii == -1 && ji > -1 {
 		return false
 	} else if ji == -1 && ii > -1 {
@@ -186,10 +186,10 @@ var headerSorterPool = sync.Pool{
 	New: func() any { return new(headerSorter) },
 }
 
-// sortedKeyValues returns h's keys sorted in the returned kvs
+// SortedKeyValues returns h's keys sorted in the returned kvs
 // slice. The headerSorter used to sort is also returned, for possible
 // return to headerSorterCache.
-func (h Header) sortedKeyValues(exclude map[string]bool, order textproto.HeaderOrder) (kvs []keyValues, hs *headerSorter) {
+func (h Header) SortedKeyValues(exclude map[string]bool, order textproto.HeaderOrder) (kvs []keyValues, hs *headerSorter) {
 	hs = headerSorterPool.Get().(*headerSorter)
 	if cap(hs.kvs) < len(h) {
 		hs.kvs = make([]keyValues, 0, len(h))
@@ -207,7 +207,7 @@ func (h Header) sortedKeyValues(exclude map[string]bool, order textproto.HeaderO
 }
 
 // WriteSubset writes a header in wire format.
-// If exclude is not nil, keys where exclude[key] == true are not written.
+// If exclude is not nil, keys where exclude[Key] == true are not written.
 // Keys are not canonicalized before checking the exclude map.
 func (h Header) WriteSubset(w io.Writer, exclude map[string]bool) error {
 	return h.writeSubset(w, exclude, textproto.HeaderOrder{}, nil)
@@ -218,20 +218,20 @@ func (h Header) writeSubset(w io.Writer, exclude map[string]bool, order textprot
 	if !ok {
 		ws = stringWriter{w}
 	}
-	kvs, sorter := h.sortedKeyValues(exclude, order)
+	kvs, sorter := h.SortedKeyValues(exclude, order)
 	var formattedVals []string
 	for _, kv := range kvs {
-		if !httpguts.ValidHeaderFieldName(kv.key) {
+		if !httpguts.ValidHeaderFieldName(kv.Key) {
 			// This could be an error. In the common case of
 			// writing response headers, however, we have no good
 			// way to provide the error back to the server
 			// handler, so just drop invalid headers instead.
 			continue
 		}
-		for _, v := range kv.values {
+		for _, v := range kv.Values {
 			v = headerNewlineToSpace.Replace(v)
 			v = textproto.TrimString(v)
-			for _, s := range []string{kv.key, ": ", v, "\r\n"} {
+			for _, s := range []string{kv.Key, ": ", v, "\r\n"} {
 				if _, err := ws.WriteString(s); err != nil {
 					headerSorterPool.Put(sorter)
 					return err
@@ -242,7 +242,7 @@ func (h Header) writeSubset(w io.Writer, exclude map[string]bool, order textprot
 			}
 		}
 		if trace != nil && trace.WroteHeaderField != nil {
-			trace.WroteHeaderField(kv.key, formattedVals)
+			trace.WroteHeaderField(kv.Key, formattedVals)
 			formattedVals = nil
 		}
 	}
@@ -251,10 +251,10 @@ func (h Header) writeSubset(w io.Writer, exclude map[string]bool, order textprot
 }
 
 // CanonicalHeaderKey returns the canonical format of the
-// header key s. The canonicalization converts the first
+// header Key s. The canonicalization converts the first
 // letter and any letter following a hyphen to upper case;
 // the rest are converted to lowercase. For example, the
-// canonical key for "accept-encoding" is "Accept-Encoding".
+// canonical Key for "accept-encoding" is "Accept-Encoding".
 // If s contains a space or invalid header field bytes, it is
 // returned without modifications.
 func CanonicalHeaderKey(s string) string { return textproto.CanonicalMIMEHeaderKey(s) }

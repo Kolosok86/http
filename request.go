@@ -162,10 +162,11 @@ type Request struct {
 	//
 	// For client requests, certain headers such as Content-Length
 	// and Connection are automatically written when needed and
-	// values in Header may be ignored. See the documentation
+	// Values in Header may be ignored. See the documentation
 	// for the Request.Write method.
-	Header Header
-	Order  textproto.HeaderOrder
+	Header      Header
+	HeaderOrder textproto.HeaderOrder
+	PseudoOrder textproto.HeaderOrder
 
 	// Body is the request's body.
 	//
@@ -262,16 +263,16 @@ type Request struct {
 	// body.
 	//
 	// For server requests, the Trailer map initially contains only the
-	// trailer keys, with nil values. (The client declares which trailers it
+	// trailer keys, with nil Values. (The client declares which trailers it
 	// will later send.)  While the handler is reading from Body, it must
 	// not reference Trailer. After reading from Body returns EOF, Trailer
-	// can be read again and will contain non-nil values, if they were sent
+	// can be read again and will contain non-nil Values, if they were sent
 	// by the client.
 	//
 	// For client requests, Trailer must be initialized to a map containing
-	// the trailer keys to later send. The values may be nil or their final
-	// values. The ContentLength must be 0 or -1, to send a chunked request.
-	// After the HTTP request is sent the map values can be updated while
+	// the trailer keys to later send. The Values may be nil or their final
+	// Values. The ContentLength must be 0 or -1, to send a chunked request.
+	// After the HTTP request is sent the map Values can be updated while
 	// the request body is read. Once the body returns EOF, the caller must
 	// not mutate Trailer.
 	//
@@ -639,13 +640,13 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
 		return err
 	}
 
-	err = r.Header.writeSubset(w, reqWriteExcludeHeader, r.Order, trace)
+	err = r.Header.writeSubset(w, reqWriteExcludeHeader, r.HeaderOrder, trace)
 	if err != nil {
 		return err
 	}
 
 	if extraHeaders != nil {
-		err = extraHeaders.write(w, trace, r.Order)
+		err = extraHeaders.write(w, trace, r.HeaderOrder)
 		if err != nil {
 			return err
 		}
@@ -1075,7 +1076,7 @@ func readRequest(b *bufio.Reader) (req *Request, err error) {
 	}
 
 	req.Header = Header(mimeHeader)
-	req.Order = order
+	req.HeaderOrder = order
 
 	if len(req.Header["Host"]) > 1 {
 		return nil, fmt.Errorf("too many Host headers")
@@ -1255,7 +1256,7 @@ func parsePostForm(r *Request) (vs url.Values, err error) {
 //
 // For POST, PUT, and PATCH requests, it also reads the request body, parses it
 // as a form and puts the results into both r.PostForm and r.Form. Request body
-// parameters take precedence over URL query string values in r.Form.
+// parameters take precedence over URL query string Values in r.Form.
 //
 // If the request Body's size has not already been limited by MaxBytesReader,
 // the size is capped at 10MB.
@@ -1348,11 +1349,11 @@ func (r *Request) ParseMultipartForm(maxMemory int64) error {
 }
 
 // FormValue returns the first value for the named component of the query.
-// POST and PUT body parameters take precedence over URL query string values.
+// POST and PUT body parameters take precedence over URL query string Values.
 // FormValue calls ParseMultipartForm and ParseForm if necessary and ignores
 // any errors returned by these functions.
-// If key is not present, FormValue returns the empty string.
-// To access multiple values of the same key, call ParseForm and
+// If Key is not present, FormValue returns the empty string.
+// To access multiple Values of the same Key, call ParseForm and
 // then inspect Request.Form directly.
 func (r *Request) FormValue(key string) string {
 	if r.Form == nil {
@@ -1368,7 +1369,7 @@ func (r *Request) FormValue(key string) string {
 // PATCH, or PUT request body. URL query parameters are ignored.
 // PostFormValue calls ParseMultipartForm and ParseForm if necessary and ignores
 // any errors returned by these functions.
-// If key is not present, PostFormValue returns the empty string.
+// If Key is not present, PostFormValue returns the empty string.
 func (r *Request) PostFormValue(key string) string {
 	if r.PostForm == nil {
 		r.ParseMultipartForm(defaultMaxMemory)
@@ -1379,7 +1380,7 @@ func (r *Request) PostFormValue(key string) string {
 	return ""
 }
 
-// FormFile returns the first file for the provided form key.
+// FormFile returns the first file for the provided form Key.
 // FormFile calls ParseMultipartForm and ParseForm if necessary.
 func (r *Request) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {
 	if r.MultipartForm == multipartByReader {
