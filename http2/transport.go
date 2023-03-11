@@ -45,7 +45,7 @@ const (
 	// transportDefaultStreamFlow is how many stream-level flow
 	// control tokens we announce to the peer, and how many bytes
 	// we buffer per stream.
-	transportDefaultStreamFlow = 6 << 20
+	transportDefaultStreamFlow = 4 << 20
 
 	defaultUserAgent = "Go-http-client/2.0"
 
@@ -177,6 +177,11 @@ type Transport struct {
 
 	connPoolOnce  sync.Once
 	connPoolOrDef ClientConnPool // non-nil version of ConnPool
+
+	// Settings
+	InitialWindowSize    uint32 // if nil, will use global initialWindowSize
+	HeaderTableSize      uint32 // if nil, will use global initialHeaderTableSize
+	InitMaxReadFrameSize uint32 // if nil, will use global defaultMaxReadFrameSize
 }
 
 func (t *Transport) maxHeaderListSize() uint32 {
@@ -717,6 +722,11 @@ func (t *Transport) maxDecoderHeaderTableSize() uint32 {
 	if v := t.MaxDecoderHeaderTableSize; v > 0 {
 		return v
 	}
+
+	if t.HeaderTableSize != 0 {
+		return t.HeaderTableSize
+	}
+
 	return initialHeaderTableSize
 }
 
@@ -724,6 +734,11 @@ func (t *Transport) maxEncoderHeaderTableSize() uint32 {
 	if v := t.MaxEncoderHeaderTableSize; v > 0 {
 		return v
 	}
+
+	if t.HeaderTableSize != 0 {
+		return t.HeaderTableSize
+	}
+
 	return initialHeaderTableSize
 }
 
@@ -738,7 +753,7 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 		readerDone:            make(chan struct{}),
 		nextStreamID:          1,
 		maxFrameSize:          16 << 10,                    // spec default
-		initialWindowSize:     65536,                       // spec default
+		initialWindowSize:     65535,                       // spec default
 		maxConcurrentStreams:  initialMaxConcurrentStreams, // "infinite", per spec. Use a smaller value until we have received server settings.
 		peerMaxHeaderListSize: 0xffffffffffffffff,          // "infinite", per spec. Use 2^64-1 instead.
 		streams:               make(map[uint32]*clientStream),
@@ -779,7 +794,7 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 
 	cc.henc = hpack.NewEncoder(&cc.hbuf)
 	cc.henc.SetMaxDynamicTableSizeLimit(t.maxEncoderHeaderTableSize())
-	cc.peerMaxHeaderTableSize = initialHeaderTableSize
+	cc.peerMaxHeaderTableSize = maxHeaderTableSize
 
 	if t.AllowHTTP {
 		cc.nextStreamID = 3
@@ -790,12 +805,29 @@ func (t *Transport) newClientConn(c net.Conn, singleUse bool) (*ClientConn, erro
 		cc.tlsState = &state
 	}
 
-	initialSettings := []Setting{
-		{ID: SettingHeaderTableSize, Val: initialWindowSize},
-		{ID: SettingEnablePush, Val: 0},
-		{ID: SettingInitialWindowSize, Val: transportDefaultStreamFlow},
-		{ID: SettingMaxConcurrentStreams, Val: defaultMaxConcurrentStreams},
-		{ID: SettingMaxHeaderListSize, Val: defaultMaxReadFrameSize},
+	var initialSettings []Setting
+
+	if t.HeaderTableSize != 0 {
+		initialSettings = append(initialSettings, Setting{ID: SettingHeaderTableSize, Val: t.HeaderTableSize})
+	} else {
+		initialSettings = append(initialSettings, Setting{ID: SettingHeaderTableSize, Val: initialHeaderTableSize})
+	}
+
+	initialSettings = append(initialSettings,
+		Setting{ID: SettingEnablePush, Val: 0},
+		Setting{ID: SettingMaxConcurrentStreams, Val: defaultMaxConcurrentStreams},
+	)
+
+	if t.InitialWindowSize != 0 {
+		initialSettings = append(initialSettings, Setting{ID: SettingInitialWindowSize, Val: t.InitialWindowSize})
+	} else {
+		initialSettings = append(initialSettings, Setting{ID: SettingInitialWindowSize, Val: transportDefaultStreamFlow})
+	}
+
+	if t.InitMaxReadFrameSize != 0 {
+		initialSettings = append(initialSettings, Setting{ID: SettingMaxHeaderListSize, Val: t.InitMaxReadFrameSize})
+	} else {
+		initialSettings = append(initialSettings, Setting{ID: SettingMaxHeaderListSize, Val: defaultMaxReadFrameSize})
 	}
 
 	if max := t.maxFrameReadSize(); max != 0 {
