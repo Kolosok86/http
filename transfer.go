@@ -275,9 +275,6 @@ func (t *transferWriter) shouldSendContentLength() bool {
 
 func (t *transferWriter) writeHeader(w io.Writer, trace *httptrace.ClientTrace) error {
 	if t.Close && !hasToken(t.Header.get("Connection"), "close") {
-		if _, err := io.WriteString(w, "Connection: close\r\n"); err != nil {
-			return err
-		}
 		if trace != nil && trace.WroteHeaderField != nil {
 			trace.WroteHeaderField("Connection", []string{"close"})
 		}
